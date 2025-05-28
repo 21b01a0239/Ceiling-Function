@@ -1,27 +1,29 @@
 # Ceiling-Function
 % Built a Python program to count unique binary search tree (BST) structures from multiple input sequences. Used preorder traversal with None placeholders to capture exact tree shapes and compared them using sets for uniqueness. %
-import sys
+
 class Node:
-    def __init__(self,value,left=None,right=None):
+    def __init__(self, value, left=None, right=None):
         self.value = value
         self.left = left
         self.right = right
+
 def insert(root, value):
     if not root:
         return Node(value)
     if value < root.value:
-        root.left = insert(root.left,value)
+        root.left = insert(root.left, value)
     else:
-        root.right = insert(root.right,value)
+        root.right = insert(root.right, value)
     return root
 
 def preorder_traversal(root, result):
     if not root:
-            result.append(None)
-            return
+        result.append(None)
+        return
     result.append(root.value)
-    preorder_traversal(root.left,result)
-    preorder_traversal(root.right,result)
+    preorder_traversal(root.left, result)
+    preorder_traversal(root.right, result)
+
 def tree_shape(layers):
     root = None
     for layer in layers:
@@ -29,33 +31,34 @@ def tree_shape(layers):
     result = []
     preorder_traversal(root, result)
     return result
-def main(argv):
-    no_of_prototypes = int(argv[0])
-    no_of_layers = int(argv[1])
+
+def main():
+    no_of_prototypes = int(input("Enter number of prototypes: "))
+    no_of_layers = int(input("Enter number of layers per prototype: "))
+    
     layers = []
     for i in range(no_of_prototypes):
-        layers.append([int(x) for x in argv[2 + i * no_of_layers : 2 + (i + 1) * no_of_layers]])
-    shapes = []
+        layer_input = input(f"Enter layers for prototype {i+1} (space-separated integers): ")
+        layer = list(map(int, layer_input.strip().split()))
+        if len(layer) != no_of_layers:
+            print("Invalid number of layers. Please try again.")
+            return
+        layers.append(layer)
 
-    for item in range(no_of_prototypes):
-        shape = tree_shape(layers[item])
-        shapes.append(shape)
+    shapes = [tree_shape(layer) for layer in layers]
+
     same_shape = []
-    for itr1 in shapes:
-        for itr2 in shapes:
-            count_of_None = 0
+    for i in range(len(shapes)):
+        for j in range(i + 1, len(shapes)):
+            if shapes[i] == shapes[j]:
+                same_shape.append(shapes[j])
 
-            if shapes.index(itr1)<shapes.index(itr2):
-                for itr in range(len(itr1)):
-                    if(itr1[itr] == None and itr2[itr] == None):
-                        count_of_None += 1    
-            if count_of_None == no_of_layers + 1:
-                same_shape.append(itr2)   
+    for item in same_shape:
+        if item in shapes:
+            shapes.remove(item)
 
-    for lists in same_shape:
-        if lists in shapes:
-            shapes.remove(lists)
-    return len(shapes)
+    print("Number of unique shapes:", len(shapes))
 
 if __name__ == "__main__":
-    print(main(sys.argv[1:]))
+    main()
+
